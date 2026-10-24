@@ -142,9 +142,25 @@ public class MyDblLinkedList<E extends Comparable<? super E>>implements MyList<E
   //      return saved element 
   public E removeFirst() {
     //left as an exercise in Lecture 9
-    return null;
-
+    if (size == 0) {
+      return null;
+    } 
+    else if (size == 1) {
+      E temp = head.element;
+      head = tail = null;
+      size = 0;
+      return temp;
+    } 
+    else {
+      E temp = head.element;
+      head = head.next;
+      head.prev = null;
+      size--;
+      return temp;
+    }
   }
+
+
 //TASK 2: ADD BEFORE
 //PRE:  accepts 2 elements
 //POST: inserts the new element as follows:
@@ -154,7 +170,28 @@ public class MyDblLinkedList<E extends Comparable<? super E>>implements MyList<E
 
   public void addBefore(E prior, E data) {
     //left as an exercise in Lecture 9
-  
+    if (size == 0) 
+      addFirst(data);
+    else if (!contains(prior))
+      addLast(data);
+    else {
+      Node<E> current = head;
+    while (current != null && !current.element.equals(prior)) {
+        current = current.next;
+      }
+      if (current != null) {
+        Node<E> newNode = new Node<>(data);
+        newNode.next = current;
+        newNode.prev = current.prev;
+        if (current.prev != null) {
+          current.prev.next = newNode;
+        } else {
+          head = newNode;
+        }
+        current.prev = newNode;
+        size++;
+      }
+    }
   }
 
   //TASK 3: DELETE BEFORE
@@ -162,9 +199,86 @@ public class MyDblLinkedList<E extends Comparable<? super E>>implements MyList<E
   //POST:  The node prior to the value given is deleted 
   public E deleteBefore(E prior) {
       //left as an exercise in Lecture 9
-      return null;
-  }
+      if (size == 0 || head.element.equals(prior)) {
+          return null; // No node before the head or empty list
+      }
 
+      //else if (size == 1) {
+          //return null; // Only one node in the list, nothing to delete
+      //}
+
+      // this check is redundant because of the while loop below.
+      // suppose the list is: [1]
+      // current = head = 1, prior = 3
+      // while loop below has current.next != null as a condition
+      // for a list of size 1, current.next would = null, so the while loop will not execute and we will exit the loop with current = head = 1
+      // then we check if current.next == null, which it is, and the same return null statement is executed. 
+      // Having both is redundant, and this is the block I decided to cut
+
+
+      
+      else {
+        
+
+          // at this point in the method, we know that the list is not empty
+          // prior is not the head
+          // the list contains AT LEAST 2 nodes 
+          
+          // if (contains(prior)) {} -> see comments on lines 218-221
+          
+          Node<E> current = head; // Start from the head and find the node with the given 'prior' value
+          while (current.next != null && !current.next.element.equals(prior)) { // we do not know 'prior' is in the list. 
+          
+          //Could check contains(prior), but that increases time complexity because it completes an additional traversal.
+          // Using a while loop instead. If prior is not in the list, current will eventually become null and we will exit the loop.
+          // The conditions of the while loop are: current.next cannot be null or the loop exits,
+          // if current.next = null, that means we are sitting at the last node without having found 'prior'
+          // and current.next.element cannot be 'prior' or the loop exits
+          // In other words, if prior exists, we don't want current to reach it's position. We want to stop just before it.  
+          // So... while (current != null && !current.next.element.equals(prior))...
+
+              current = current.next; // Traverse to the next node
+          }
+
+          // walking through an example list for my own reference: 1,2, 3, 4, 5, ...
+          // current = head = 1, suppose 'prior' = 3
+          // While the next node is NOT 'prior', move to the next node
+          // Starting at 1, the next node is 2. Does 2 = 3? No, move to node 2.
+          // Current = 2. The next node is 3. Does 3 = 3? Yes, exit the loop.
+          // Current is left sitting at the position just before 'prior'
+          
+          
+          //If the loop ends and current is null, it means 'prior' was not found in the list. In that case, we should return null.
+          
+          //Otherwise, we have found the node just before 'prior', which is current. We want to delete current. 
+
+          if (current.next == null){ // if we made it to the end of the list and current.next is null, that's a problem. 
+          // We would return null instead of trying to delete
+              return null;
+          }
+          
+          if (current.prev == null){// if current.prev is null, that means current is the head, and we cannot just delete the head without adjusting the head pointer.
+            // adjust the pointer of the head to point to current.next, and adjust the prev pointer of current.next to null, then return current.element
+            
+              head = current.next; // make the next node the head
+              head.prev = null; // adjust the prev pointer of the head to null
+              size--; // decrement size
+              return current.element; // return the element of the node that was just deleted (current)
+            }
+          
+
+          // now we can delete current, which is just a matter of adjusting the pointers of the nodes around it.
+              current.prev.next = current.next; // bypass current
+              current.next.prev = current.prev; // bypass current
+              // visualized: 
+              // |prev = null|* ELEMNT A*|next = B|->  <-|prev = A|* ELEMENT B*|next = C|->  <- |prev = B|*Element C*|next = null|,  where current = B
+              // we want to delete b (current). So... A (current.prev.next) connects to C (current.next)
+              // and C (current.next.prev) connects to A (current.prev)
+              size--; // decrement size
+              return current.element; // return the element of the node that was just deleted (current)
+              } 
+          }
+  
   
   @Override
   //Remove the element at the specified position in this list
@@ -206,6 +320,10 @@ public class MyDblLinkedList<E extends Comparable<? super E>>implements MyList<E
   public String toString() {
 
     StringBuilder result = new StringBuilder("[");
+    if (size == 0) {
+      result.append("]");
+      return result.toString();
+    }
 
     Node<E> current = head;
     for (int i = 0; i < size; i++) {
@@ -289,10 +407,10 @@ public class MyDblLinkedList<E extends Comparable<? super E>>implements MyList<E
 
   public int lastIndexOf(E e) {
     // Left as an exercise in lecture 8 (same code)
-    int position = size - 1, holdPosition = -1;
+    int position = size - 1;
     Node<E> current = tail;
 
-    if (current != null) {
+    while (current != null) {
         if (current.element.equals(e))
             return position;
         current = current.prev;
@@ -312,8 +430,11 @@ public class MyDblLinkedList<E extends Comparable<? super E>>implements MyList<E
   public E set(int index, E e) {
     // Left as an exercise in lecture 8 (same code)
     //return null;
-    if (size == 0 || index < 0 || index > size) {
-      return null;
+    if (size == 0) {
+      throw new IndexOutOfBoundsException("Cannot set an element because the list is empty.");
+    }
+    if (index < 0 || index >= size) {
+      throw new IndexOutOfBoundsException("Index" + index + "is out of bounds. Valid indices are 0 through" + (size - 1) + ".");
     }
     Node<E> current = head;
     for (int i = 0; i < index; i++) 

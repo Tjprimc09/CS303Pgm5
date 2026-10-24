@@ -1,7 +1,7 @@
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.io.PrintWriter;
 
 public class Functions {
 
@@ -58,10 +58,16 @@ public class Functions {
         out.println("\nSTACK 4: DECIMAL TO BINARY EVALUATOR");
 
         ArrayList<Integer> binary = new ArrayList<>(Arrays.asList(15, 81, 105, 255, 256, 0, 1 ));
+
+        for (int num : binary) {
+            String binaryString = decToBinary(num);
+            System.out.println("Decimal: " + num + " -> Binary: " + binaryString);
+            out.println("Decimal: " + num + " -> Binary: " + binaryString);
+        }
  
     }
 
-  
+
     public static void testIsBalanced(PrintWriter out) {
         System.out.println("\nSTACK 5: PARENTHESIS IS BALANCED EVALUATOR");
         out.println("\nSTACK 5: PARENTHESIS IS BALANCED EVALUATOR");
@@ -81,7 +87,94 @@ public class Functions {
 
         ArrayList<String> expList = new ArrayList<>(Arrays.asList(
             "D add a", "D add b", "D add c", "R", "U","U","R","U","D add d", "U", "U", "U", "R", "F", "Q"));
+        // I want a stack to keep track of values that have been added, and a stack to keep track of values that have been undone. 
 
+        MyStack<String> addedStack = new MyStack<>();
+        MyStack<String> undoneStack = new MyStack<>();
+
+        // When I add a value, I push it onto the added stack. 
+        // When I undo, I pop from the added stack and push onto the undone stack. 
+        // When I redo, I pop from the undone stack and push back onto the added stack. 
+        // This way, I can keep track of the current state of the list and allow for multiple undos and redos.
+        for (String command : expList) {
+            // Process each command and perform the corresponding action (add, undo, redo, etc.)
+            switch (command.charAt(0)) {
+                case 'D':
+                    // Add the element to the list
+                    String elementToAdd = command.substring(6); // Extract the element after "D add "
+                    addedStack.push(elementToAdd);
+                    System.out.println("Performing: add" + elementToAdd);
+                    out.println("Performing: add " + elementToAdd);
+                    break;
+                case 'U': 
+                    // Undo the last action
+                    if (!addedStack.isEmpty()) {
+                        String elementToUndo = addedStack.pop();
+                        undoneStack.push(elementToUndo);
+                        System.out.println("Undoing: command: " + command + elementToUndo);
+                        out.println("Undoing: command: " + command + elementToUndo);
+                    } else {
+                        System.out.println("Stack is empty.");
+                        out.println("Stack is empty.");
+                    }
+                    break;
+                case 'R':
+                    // Redo the last undone action
+                    if (!undoneStack.isEmpty()) {
+                        String elementToRedo = undoneStack.pop();
+                        addedStack.push(elementToRedo);
+                        System.out.println("Redoing: command: " + command + elementToRedo);
+                        out.println("Redoing: command: " + command + elementToRedo);
+                    } else {
+                        System.out.println("Stack is empty.");
+                        out.println("Stack is empty.");
+                    }
+                    break;
+                case 'F':
+                    // Finish processing commands
+                    System.out.println("Invalid command entered: " + command);
+                    out.println("Invalid command entered: " + command);
+                    break;
+                case 'Q':
+                    // Quit the program
+                    System.out.println("Program ending.");
+                    out.println("Program ending.");
+                    return; // Exit the method
+                default:
+                    System.out.println("Unknown command: " + command);
+                    out.println("Unknown command: " + command);
+            }
+        }
+
+    }
+
+    private static String decToBinary(int num) {
+        if (num < 0) 
+            throw new IllegalArgumentException("Input must be a non-negative integer.");
+        
+        if (num == 0) {
+            return "0";
+        }
+        else {
+            // Convert the number to binary and use a stack to reverse the order of the bits
+            // binary uses base 2, so I can repeatedly divide the number by 2, pushing the remainder onto the stack
+            // then use the StringBuilder and pop operations on the stack to get the binary in the correct order
+            // Example: 10 in binary is 1010
+            // 10/2 = 5 R 0 (push 0); 5/2 = 2 R 1 (push 1); 2/2 = 1 R 0 (push 0); 1/2 = 0 R 1 (push 1)
+            // Popping the stack gives us the reverse order: 1, 0, 1, 0
+            
+            StringBuilder binaryString = new StringBuilder();
+            MyStack<Integer> stack = new MyStack<>();
+            while (num > 0) {
+                stack.push(num % 2);
+                num /= 2;
+            }
+            
+            while (!stack.isEmpty()) {
+                binaryString.append(stack.pop());
+            }
+            return binaryString.toString();
+        }
     }
 
 }
