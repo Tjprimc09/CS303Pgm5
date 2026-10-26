@@ -1,7 +1,8 @@
 // Tyler Prince
 // 10/24/2026
 // Functions implemented: Undo/Redo Command Processing and Decimal to Binary Conversion
-
+//
+// Updated 10/25/2026 to include methods implemented by Aisha Tahlil: testPalindrome(), testIsBalanced()
 
 import java.io.IOException;
 import java.io.PrintWriter;

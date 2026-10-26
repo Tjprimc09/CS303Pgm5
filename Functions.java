@@ -54,6 +54,20 @@ public class Functions {
     }
 
 
+    public static void testPostFixExpression(PrintWriter out) {
+       System.out.println("\nSTACK 2: POSTFIX EVALUATOR");
+       out.println("\nSTACK 2: POSTFIX EVALUATOR");      
+
+
+       ArrayList<String> expList = new ArrayList<>(Arrays.asList(
+           "5 7 * 15 + 25 *",
+           "5 0 / 4 +",
+           "15 2 * 3 / 15 +",
+           "3 5 7 + *",
+           "3 5 6"));
+
+
+   }
 
     
     public static void testPreFixExpression(PrintWriter out) {
@@ -70,12 +84,10 @@ public class Functions {
             "+ 15 / 3 * 2 15",
             "* + 7 5 3",
             "6 5 3"));
-
-
-
-
-    }
-
+}
+    //PRE: Accepts a PrintWriter object to write output to a file
+    //POST: Evaluates a series of decimal numbers and calls helper method to convert them to binary
+    //POST: Prints the results to the console and the output file
     public static void testDecToBinary(PrintWriter out) {
         System.out.println("\nSTACK 4: DECIMAL TO BINARY EVALUATOR");
         out.println("\nSTACK 4: DECIMAL TO BINARY EVALUATOR");
@@ -163,6 +175,9 @@ public class Functions {
         }
     }
 
+
+    //PRE: Accepts a PrintWriter object to write output to a file
+    //POST: Evaluates a series of commands for adding, undoing, and redoing actions, and prints the results to the console and the output file
     public static void testUndoRedo(PrintWriter out) {
         System.out.println("\nSTACK 6: UNDO REDO FUNCTION EVALUATOR");
         out.println("\nSTACK 6: UNDO REDO FUNCTION EVALUATOR");
@@ -230,6 +245,9 @@ public class Functions {
 
     }
 
+
+    //PRE: Accepts an integer is input
+    //POST: Validates the input and converts the decimal number to binary using a stack, returning the binary representation as a string
     private static String decToBinary(int num) {
         if (num < 0) 
             throw new IllegalArgumentException("Input must be a non-negative integer.");
