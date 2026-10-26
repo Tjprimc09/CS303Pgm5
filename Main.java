@@ -3,6 +3,7 @@
 // Functions implemented: Undo/Redo Command Processing and Decimal to Binary Conversion
 //
 // Updated 10/25/2026 to include methods implemented by Aisha Tahlil: testPalindrome(), testIsBalanced()
+// Updated 10/25/2026 to include methods implemented by Natasha Jama: testPostFixExpression(), testPreFixExpression()
 
 import java.io.IOException;
 import java.io.PrintWriter;

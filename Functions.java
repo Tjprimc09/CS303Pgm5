@@ -54,26 +54,36 @@ public class Functions {
     }
 
 
+     // Tests all required postfix expressions.
     public static void testPostFixExpression(PrintWriter out) {
-       System.out.println("\nSTACK 2: POSTFIX EVALUATOR");
-       out.println("\nSTACK 2: POSTFIX EVALUATOR");      
+        System.out.println("\nSTACK 2: POSTFIX EVALUATOR");
+        out.println("\nSTACK 2: POSTFIX EVALUATOR");
 
+        ArrayList<String> expList = new ArrayList<>(Arrays.asList(
+            "5 7 * 15 + 25 *",
+            "5 0 / 4 +",
+            "15 2 * 3 / 15 +",
+            "3 5 7 + *",
+            "3 5 6"
+        ));
 
-       ArrayList<String> expList = new ArrayList<>(Arrays.asList(
-           "5 7 * 15 + 25 *",
-           "5 0 / 4 +",
-           "15 2 * 3 / 15 +",
-           "3 5 7 + *",
-           "3 5 6"));
+        for (String expression : expList) {
+            Integer result = evaluatePostfix(expression);
 
+            if (result == null) {
+                printResult(out, "The expression: "
+                        + expression + " is invalid.");
+            } else {
+                printResult(out, "The result of the postfix expression: "
+                        + expression + " = " + result);
+            }
+        }
+    }
 
-   }
-
-    
+    // Tests all required prefix expressions.
     public static void testPreFixExpression(PrintWriter out) {
         System.out.println("\nSTACK 3: PREFIX EVALUATOR");
         out.println("\nSTACK 3: PREFIX EVALUATOR");
-
 
         ArrayList<String> expList = new ArrayList<>(Arrays.asList(
             "+ * 7 5 + 6 7",
@@ -83,8 +93,174 @@ public class Functions {
             "+ 4 / 0 5",
             "+ 15 / 3 * 2 15",
             "* + 7 5 3",
-            "6 5 3"));
-}
+            "6 5 3"
+        ));
+
+        for (String expression : expList) {
+            Integer result = evaluatePrefix(expression);
+
+            if (result == null) {
+                printResult(out, "The expression: "
+                        + expression + " is invalid.");
+            } else {
+                printResult(out, "The result of the prefix expression: "
+                        + expression + " = " + result);
+            }
+        }
+    }
+
+    // PRE: Receives a postfix expression with space-separated tokens.
+    // POST: Returns its result, or null if the expression is invalid.
+    public static Integer evaluatePostfix(String expression) {
+        if (expression == null || expression.trim().isEmpty()) {
+            return null;
+        }
+
+        MyStack<Integer> stack = new MyStack<>();
+        String[] tokens = expression.trim().split("\\s+");
+
+        try {
+            for (String token : tokens) {
+                if (isInteger(token)) {
+                    stack.push(Integer.parseInt(token));
+                } else if (isOperator(token)) {
+                    if (stack.size() < 2) {
+                        return null;
+                    }
+
+                    int right = stack.pop();
+                    int left = stack.pop();
+
+                    Integer result = calculate(left, right, token);
+
+                    if (result == null) {
+                        return null;
+                    }
+
+                    stack.push(result);
+                } else {
+                    return null;
+                }
+            }
+
+            if (stack.size() != 1) {
+                return null;
+            }
+
+            return stack.pop();
+
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    // PRE: Receives a prefix expression with space-separated tokens.
+    // POST: Returns its result, or null if the expression is invalid.
+    public static Integer evaluatePrefix(String expression) {
+        if (expression == null || expression.trim().isEmpty()) {
+            return null;
+        }
+
+        MyStack<Integer> stack = new MyStack<>();
+        String[] tokens = expression.trim().split("\\s+");
+
+        try {
+            for (int i = tokens.length - 1; i >= 0; i--) {
+                String token = tokens[i];
+
+                if (isInteger(token)) {
+                    stack.push(Integer.parseInt(token));
+                } else if (isOperator(token)) {
+                    if (stack.size() < 2) {
+                        return null;
+                    }
+
+                    int left = stack.pop();
+                    int right = stack.pop();
+
+                    Integer result = calculate(left, right, token);
+
+                    if (result == null) {
+                        return null;
+                    }
+
+                    stack.push(result);
+                } else {
+                    return null;
+                }
+            }
+
+            if (stack.size() != 1) {
+                return null;
+            }
+
+            return stack.pop();
+
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    // PRE: Receives a token.
+    // POST: Returns true if the token is a valid integer.
+    private static boolean isInteger(String token) {
+        if (token == null || token.isEmpty()) {
+            return false;
+        }
+
+        try {
+            Integer.parseInt(token);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    // PRE: Receives a token.
+    // POST: Returns true if it is a supported operator.
+    private static boolean isOperator(String token) {
+        return token.equals("+")
+                || token.equals("-")
+                || token.equals("*")
+                || token.equals("/");
+    }
+
+    // PRE: Receives two operands and an operator.
+    // POST: Returns the calculated value, or null if invalid.
+    private static Integer calculate(int left, int right, String operator) {
+        try {
+            switch (operator) {
+                case "+":
+                    return Math.addExact(left, right);
+                case "-":
+                    return Math.subtractExact(left, right);
+                case "*":
+                    return Math.multiplyExact(left, right);
+                case "/":
+                    if (right == 0) {
+                        return null;
+                    }
+
+                    if (left == Integer.MIN_VALUE && right == -1) {
+                        return null;
+                    }
+
+                    return left / right;
+                default:
+                    return null;
+            }
+        } catch (ArithmeticException e) {
+            return null;
+        }
+    }
+
+    // PRE: Receives a message and report writer.
+    // POST: Prints the message to the console and report.
+    private static void printResult(PrintWriter out, String message) {
+        System.out.println(message);
+        out.println(message);
+    }
+
     //PRE: Accepts a PrintWriter object to write output to a file
     //POST: Evaluates a series of decimal numbers and calls helper method to convert them to binary
     //POST: Prints the results to the console and the output file
