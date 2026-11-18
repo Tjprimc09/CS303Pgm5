@@ -11,6 +11,9 @@ public class MyDblLinkedList<E extends Comparable<? super E>>implements MyList<E
   public MyDblLinkedList(E[] objects) {
     for (int i = 0; i < objects.length; i++)
       add(objects[i]); 
+    
+    //for (E object: objects){
+    //add(object)}
   }
 
   //Retrieve the element at the head
